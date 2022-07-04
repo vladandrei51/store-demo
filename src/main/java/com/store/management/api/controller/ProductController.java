@@ -22,8 +22,9 @@ public class ProductController {
     }
 
     /**
-     * handles the get on /product/get-all request, calls the {@link ProductService}
+     * handles the get on /product/get-all request
      * and returns the list of all products
+     *
      * @return list of all mapped {@link ProductDTO} from the in-memory db
      */
     @GetMapping("/get-all")
@@ -34,7 +35,8 @@ public class ProductController {
 
     /**
      * handles the get on /product/get-by-id request,
-     * by calling {@link ProductService}, it returns the product whose id is the one in the request param
+     * it returns the product by id
+     * if it doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
      * @param id
      * @return the mapped {@link ProductDTO}
      */
@@ -49,6 +51,8 @@ public class ProductController {
      * it compares the product found at {@code idToModify} with the one given at {@code updatedProduct}
      * If the new product has unknown fields (new product category / supplier etc), that new entitiy
      * will be saved to the DB and assigned to the new {@code updatedProduct}
+     * if the {@code id} doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
+     *
      * @param updatedProduct
      * @param idToModify
      * @return
@@ -57,5 +61,28 @@ public class ProductController {
     public ProductDTO updateProduct(@RequestBody final ProductDTO updatedProduct, @RequestParam("id") final int idToModify) {
         LOG.info("updateProduct invoked with argument updatedProduct={}, id={} from /product/update-product", updatedProduct, idToModify);
         return productService.updateProduct(updatedProduct, idToModify);
+    }
+
+    /**
+     * Deletes the {@link com.store.management.model.Product} with the id = {@code id}
+     * if it doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delete-by-id")
+    public ProductDTO deleteProduct(@RequestParam("id") final int id) {
+        return productService.deleteProduct(id);
+    }
+
+    /**
+     * Persists a new product in DB based off the DTO provided
+     *
+     * @param productDTO
+     * @return
+     */
+    @PostMapping("/add-new-product")
+    public ProductDTO addNewProduct(@RequestBody final ProductDTO productDTO) {
+        return productService.addNewProduct(productDTO);
     }
 }

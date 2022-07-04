@@ -3,6 +3,7 @@ package com.store.management.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,6 +15,12 @@ public class Product extends PersistedBean {
     private Set<Category> categories;
     private int price;
     private String description;
+
+    public Product() {
+        this.productSpec = new ProductSpec();
+        this.categories = new HashSet<>();
+        this.supplier = new Supplier();
+    }
 
     @Column(name = "ProductName")
     public String getName() {

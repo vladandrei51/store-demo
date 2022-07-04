@@ -14,12 +14,13 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
-     * Handles {@link ProductNotFoundException}. Triggered usually when can't find a product of a given ID.
+     * Handles {@link RecordNotFoundException}. Triggered usually when can't find a product of a given ID.
+     *
      * @param ex
      * @return
      */
-    @ExceptionHandler(ProductNotFoundException.class)
-    protected ResponseEntity<Object> handleEntityNotFound(ProductNotFoundException ex) {
+    @ExceptionHandler(RecordNotFoundException.class)
+    protected ResponseEntity<Object> handleEntityNotFound(RecordNotFoundException ex) {
         ApiError apiError = new ApiError(NOT_FOUND);
         apiError.setMessage(ex.getLocalizedMessage());
         return buildResponseEntity(apiError);

@@ -2,7 +2,7 @@ package com.store.management.api.service;
 
 import com.store.management.api.DomainToDTOMapper;
 import com.store.management.api.dto.ProductDTO;
-import com.store.management.api.errorhandling.ProductNotFoundException;
+import com.store.management.api.errorhandling.RecordNotFoundException;
 import com.store.management.dao.CategoryDao;
 import com.store.management.dao.ProductDao;
 import com.store.management.dao.ProductSpecDao;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,42 +48,49 @@ public class ProductService {
     public ProductDTO getById(int id) {
         return productDao.findById(id)
                 .map(domainToDTOMapper::mapProductToDTO)
-                .orElseThrow(() -> new ProductNotFoundException(Product.class, "id", String.valueOf(id)));
+                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(id)));
     }
 
     public ProductDTO updateProduct(ProductDTO updatedProduct, int idToModify) {
         return productDao.findById(idToModify)
                 .map(toBeUpdatedProduct -> {
-                    toBeUpdatedProduct.setName(updatedProduct.getProductName());
-                    toBeUpdatedProduct.setPrice(updatedProduct.getPrice());
-                    toBeUpdatedProduct.setDescription(updatedProduct.getDescription());
-                    final boolean productSpecMatches = toBeUpdatedProduct.getProductSpec().getColor().equals(updatedProduct.getColor()) &&
-                            toBeUpdatedProduct.getProductSpec().getCapacity().equals(updatedProduct.getCapacity());
-                    final boolean supplierNameMatches = toBeUpdatedProduct.getSupplier().getName().equals(updatedProduct.getProductSupplierName());
-                    final boolean categoriesMatch = toBeUpdatedProduct.getCategories().stream().map(Category::getCategoryName).sorted().toList()
-                                .equals(updatedProduct.getCategories().stream().sorted().collect(Collectors.toList()));
-                    if (!productSpecMatches) {
-                        updateProductSpec(toBeUpdatedProduct, updatedProduct.getColor(), updatedProduct.getCapacity());
-                    }
-                    if (!supplierNameMatches) {
-                        updateSupplier(toBeUpdatedProduct, updatedProduct.getProductSupplierName());
-                    }
-                    if (!categoriesMatch) {
-                        updateCategories(toBeUpdatedProduct, updatedProduct.getCategories());
-                    }
+                    createProductOffDTO(updatedProduct, toBeUpdatedProduct);
                     return domainToDTOMapper.mapProductToDTO(toBeUpdatedProduct);
                 })
-                .orElseThrow(() -> new ProductNotFoundException(Product.class, "id", String.valueOf(idToModify)));
+                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(idToModify)));
+    }
+
+    private void createProductOffDTO(ProductDTO updatedProduct, Product result) {
+        Optional.of(updatedProduct.getProductName()).ifPresent(result::setName);
+        Optional.of(updatedProduct.getPrice()).ifPresent(result::setPrice);
+        Optional.of(updatedProduct.getDescription()).ifPresent(result::setDescription);
+
+        // use Objects.equals since it allow for potential null params
+        final boolean productSpecMatches = Objects.equals(result.getProductSpec().getColor(), updatedProduct.getColor()) && Objects.equals(result.getProductSpec().getCapacity(), updatedProduct.getCapacity());
+        if (!productSpecMatches) {
+            updateProductSpec(result, updatedProduct.getColor(), updatedProduct.getCapacity());
+        }
+
+        final boolean supplierNameMatches = Objects.equals(result.getSupplier().getName(), updatedProduct.getProductSupplierName());
+        if (!supplierNameMatches) {
+            updateSupplier(result, updatedProduct.getProductSupplierName());
+        }
+
+        final boolean categoriesMatch = result.getCategories().stream().map(Category::getCategoryName).sorted().toList()
+                .equals(updatedProduct.getCategories().stream().sorted().collect(Collectors.toList()));
+        if (!categoriesMatch) {
+            updateCategories(result, updatedProduct.getCategories());
+        }
     }
 
     private void updateCategories(Product toBeUpdatedProduct, List<String> newCategories) {
         var categoriesToAssign = new HashSet<Category>();
         newCategories.forEach(categoryName ->
                 categoryDao.findByCategoryName(categoryName)
-                    .ifPresentOrElse(
-                            categoriesToAssign::add,
-                            () -> categoriesToAssign.add(categoryDao.save(new Category(categoryName)))
-                    ));
+                        .ifPresentOrElse(
+                                categoriesToAssign::add,
+                                () -> categoriesToAssign.add(categoryDao.save(new Category(categoryName)))
+                        ));
         toBeUpdatedProduct.setCategories(categoriesToAssign);
     }
 
@@ -100,5 +109,21 @@ public class ProductService {
                         toBeUpdatedProduct::setProductSpec,
                         () -> toBeUpdatedProduct.setProductSpec(productSpecDao.save(new ProductSpec(color, capacity)))
                 );
+    }
+
+    public ProductDTO deleteProduct(int id) {
+        return productDao.findById(id)
+                .map((prod) -> {
+                    productDao.delete(prod);
+                    return domainToDTOMapper.mapProductToDTO(prod);
+                })
+                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(id)));
+    }
+
+    public ProductDTO addNewProduct(ProductDTO productDTO) {
+        Product toAdd = new Product();
+        createProductOffDTO(productDTO, toAdd);
+        productDao.save(toAdd);
+        return productDTO;
     }
 }
