@@ -1,8 +1,6 @@
-package com.store.management.model.product;
+package com.store.management.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.store.management.model.PersistedBean;
-import com.store.management.model.Supplier;
 
 import javax.persistence.*;
 import java.util.Set;
