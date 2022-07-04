@@ -2,14 +2,15 @@ package com.store.management.api.service;
 
 import com.store.management.api.DomainToDTOMapper;
 import com.store.management.api.dto.ProductDTO;
+import com.store.management.api.errorhandling.ProductNotFoundException;
 import com.store.management.dao.CategoryDao;
 import com.store.management.dao.ProductDao;
 import com.store.management.dao.ProductSpecDao;
 import com.store.management.dao.SupplierDao;
-import com.store.management.model.Supplier;
 import com.store.management.model.Category;
 import com.store.management.model.Product;
 import com.store.management.model.ProductSpec;
+import com.store.management.model.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class ProductService {
     public ProductDTO getById(int id) {
         return productDao.findById(id)
                 .map(domainToDTOMapper::mapProductToDTO)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new ProductNotFoundException(Product.class, "id", String.valueOf(id)));
     }
 
     public ProductDTO updateProduct(ProductDTO updatedProduct, int idToModify) {
@@ -70,7 +71,7 @@ public class ProductService {
                     }
                     return domainToDTOMapper.mapProductToDTO(toBeUpdatedProduct);
                 })
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new ProductNotFoundException(Product.class, "id", String.valueOf(idToModify)));
     }
 
     private void updateCategories(Product toBeUpdatedProduct, List<String> newCategories) {
