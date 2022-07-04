@@ -9,10 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Product")
-@NamedQueries({
-        @NamedQuery(name = "Product.findById",
-                    query = "SELECT p FROM Product p WHERE p.id = :id")
-})
 public class Product extends PersistedBean {
     private String name;
     private Supplier supplier;
@@ -21,7 +17,7 @@ public class Product extends PersistedBean {
     private int price;
     private String description;
 
-    @Column(name = "Name")
+    @Column(name = "ProductName")
     public String getName() {
         return name;
     }
