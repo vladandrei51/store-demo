@@ -60,26 +60,26 @@ public class ProductService {
                 .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(idToModify)));
     }
 
-    private void createProductOffDTO(ProductDTO updatedProduct, Product result) {
-        Optional.of(updatedProduct.getProductName()).ifPresent(result::setName);
-        Optional.of(updatedProduct.getPrice()).ifPresent(result::setPrice);
-        Optional.of(updatedProduct.getDescription()).ifPresent(result::setDescription);
+    private void createProductOffDTO(ProductDTO updatedProduct, Product toBeUpdatedProduct) {
+        Optional.of(updatedProduct.getProductName()).ifPresent(toBeUpdatedProduct::setName);
+        Optional.of(updatedProduct.getPrice()).ifPresent(toBeUpdatedProduct::setPrice);
+        Optional.of(updatedProduct.getDescription()).ifPresent(toBeUpdatedProduct::setDescription);
 
         // use Objects.equals since it allow for potential null params
-        final boolean productSpecMatches = Objects.equals(result.getProductSpec().getColor(), updatedProduct.getColor()) && Objects.equals(result.getProductSpec().getCapacity(), updatedProduct.getCapacity());
+        final boolean productSpecMatches = Objects.equals(toBeUpdatedProduct.getProductSpec().getColor(), updatedProduct.getColor()) && Objects.equals(toBeUpdatedProduct.getProductSpec().getCapacity(), updatedProduct.getCapacity());
         if (!productSpecMatches) {
-            updateProductSpec(result, updatedProduct.getColor(), updatedProduct.getCapacity());
+            updateProductSpec(toBeUpdatedProduct, updatedProduct.getColor(), updatedProduct.getCapacity());
         }
 
-        final boolean supplierNameMatches = Objects.equals(result.getSupplier().getName(), updatedProduct.getProductSupplierName());
+        final boolean supplierNameMatches = Objects.equals(toBeUpdatedProduct.getSupplier().getName(), updatedProduct.getProductSupplierName());
         if (!supplierNameMatches) {
-            updateSupplier(result, updatedProduct.getProductSupplierName());
+            updateSupplier(toBeUpdatedProduct, updatedProduct.getProductSupplierName());
         }
 
-        final boolean categoriesMatch = result.getCategories().stream().map(Category::getCategoryName).sorted().toList()
+        final boolean categoriesMatch = toBeUpdatedProduct.getCategories().stream().map(Category::getCategoryName).sorted().toList()
                 .equals(updatedProduct.getCategories().stream().sorted().collect(Collectors.toList()));
         if (!categoriesMatch) {
-            updateCategories(result, updatedProduct.getCategories());
+            updateCategories(toBeUpdatedProduct, updatedProduct.getCategories());
         }
     }
 
