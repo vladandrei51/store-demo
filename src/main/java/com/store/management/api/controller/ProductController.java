@@ -22,7 +22,7 @@ public class ProductController {
     }
 
     /**
-     * handles the get on /api/product/ request
+     * handles the get on /api/product/get/ request
      * and returns the list of all products
      *
      * @return list of all mapped {@link ProductDTO} from the in-memory db
@@ -34,7 +34,7 @@ public class ProductController {
     }
 
     /**
-     * handles the get on /api/product/get-by-id request,
+     * handles the get on /api/product/get/id/ request,
      * it returns the product by id
      * if it doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
      *
@@ -48,7 +48,7 @@ public class ProductController {
     }
 
     /**
-     * handles the put on /api/product/ request
+     * handles the put on /api/product/update-product/ request
      * it compares the product found at {@code idToModify} with the one given at {@code updatedProduct}
      * If the new product has unknown fields (new product category / supplier etc), that new entity
      * will be saved to the DB and assigned to the new {@code updatedProduct}
