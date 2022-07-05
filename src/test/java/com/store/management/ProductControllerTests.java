@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.testng.Assert;
 
 import javax.transaction.Transactional;
 
@@ -53,12 +52,12 @@ public class ProductControllerTests {
     public void getProductById_whenGetMethod_withValidId() {
         // check if the response of /get-by/ API has the expected fields
         var response = productController.getById(VALID_PRODUCT_ID_111);
-        Assert.assertEquals(response.getProductName(), PRODUCT_ID_111_NAME);
-        Assert.assertEquals(response.getColor(), PRODUCT_ID_111_PRODUCT_SPEC_COLOR);
-        Assert.assertEquals(response.getCapacity(), PRODUCT_ID_111_PRODUCT_SPEC_CAPACITY);
-        Assert.assertEquals(response.getPrice(), PRODUCT_ID_111_PRICE);
-        Assert.assertEquals(response.getDescription(), PRODUCT_ID_111_DESCRIPTION);
-        Assert.assertEquals(response.getProductSupplierName(), PRODUCT_ID_111_SUPPLIER_NAME);
+        assertEquals(response.getProductName(), PRODUCT_ID_111_NAME);
+        assertEquals(response.getColor(), PRODUCT_ID_111_PRODUCT_SPEC_COLOR);
+        assertEquals(response.getCapacity(), PRODUCT_ID_111_PRODUCT_SPEC_CAPACITY);
+        assertEquals(response.getPrice(), PRODUCT_ID_111_PRICE);
+        assertEquals(response.getDescription(), PRODUCT_ID_111_DESCRIPTION);
+        assertEquals(response.getProductSupplierName(), PRODUCT_ID_111_SUPPLIER_NAME);
     }
 
     @Test
@@ -72,12 +71,12 @@ public class ProductControllerTests {
         var toAddProduct = createDummyProduct();
         // add new product and check if the response has the adequate fields
         var response = productController.addNewProduct(domainToDTOMapper.mapProductToDTO(toAddProduct));
-        Assert.assertEquals(response.getProductName(), PRODUCT_NAME_DUMMY);
-        Assert.assertEquals(response.getColor(), PRODUCT_COLOR_DUMMY);
-        Assert.assertEquals(response.getCapacity(), PRODUCT_CAPACITY_DUMMY);
-        Assert.assertEquals(response.getPrice(), PRODUCT_PRICE_DUMMY);
-        Assert.assertEquals(response.getDescription(), PRODUCT_DESCRIPTION_DUMMY);
-        Assert.assertEquals(response.getProductSupplierName(), PRODUCT_SUPPLIER_NAME_DUMMY);
+        assertEquals(response.getProductName(), PRODUCT_NAME_DUMMY);
+        assertEquals(response.getColor(), PRODUCT_COLOR_DUMMY);
+        assertEquals(response.getCapacity(), PRODUCT_CAPACITY_DUMMY);
+        assertEquals(response.getPrice(), PRODUCT_PRICE_DUMMY);
+        assertEquals(response.getDescription(), PRODUCT_DESCRIPTION_DUMMY);
+        assertEquals(response.getProductSupplierName(), PRODUCT_SUPPLIER_NAME_DUMMY);
 
         // check if a new record has been added to db
         assertEquals(productDao.count(), TOTAL_PRODUCTS_RECORD + 1);
