@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/product")
 public class ProductController {
     private static final Logger LOG = LoggerFactory.getLogger(ProductController.class);
 
@@ -22,34 +22,35 @@ public class ProductController {
     }
 
     /**
-     * handles the get on /product/get-all request
+     * handles the get on /api/product/ request
      * and returns the list of all products
      *
      * @return list of all mapped {@link ProductDTO} from the in-memory db
      */
-    @GetMapping("/get-all")
+    @GetMapping("/get/")
     public List<ProductDTO> getAll() {
         LOG.info("getAll invoked from /product/get-all");
         return productService.getAll();
     }
 
     /**
-     * handles the get on /product/get-by-id request,
+     * handles the get on /api/product/get-by-id request,
      * it returns the product by id
      * if it doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
+     *
      * @param id
      * @return the mapped {@link ProductDTO}
      */
-    @GetMapping("/get-by-id")
+    @GetMapping("/get/id/")
     public ProductDTO getById(@RequestParam("id") final int id) {
         LOG.info("getById invoked with argument id={} from /product/get-by-id", id);
         return productService.getById(id);
     }
 
     /**
-     * handles the post on /product/update-product request
+     * handles the put on /api/product/ request
      * it compares the product found at {@code idToModify} with the one given at {@code updatedProduct}
-     * If the new product has unknown fields (new product category / supplier etc), that new entitiy
+     * If the new product has unknown fields (new product category / supplier etc), that new entity
      * will be saved to the DB and assigned to the new {@code updatedProduct}
      * if the {@code id} doesn't exist, it throws {@link com.store.management.api.errorhandling.RecordNotFoundException}
      *
@@ -57,7 +58,7 @@ public class ProductController {
      * @param idToModify
      * @return
      */
-    @PostMapping("/update-product")
+    @PutMapping("/update-product/")
     public ProductDTO updateProduct(@RequestBody final ProductDTO updatedProduct, @RequestParam("id") final int idToModify) {
         LOG.info("updateProduct invoked with argument updatedProduct={}, id={} from /product/update-product", updatedProduct, idToModify);
         return productService.updateProduct(updatedProduct, idToModify);
@@ -70,19 +71,20 @@ public class ProductController {
      * @param id
      * @return
      */
-    @DeleteMapping("/delete-by-id")
+    @DeleteMapping("/delete/id/")
     public ProductDTO deleteProduct(@RequestParam("id") final int id) {
         return productService.deleteProduct(id);
     }
 
     /**
+     * Handles the post on /api/product/insert request
      * Persists a new product in DB based off the DTO provided
      *
      * @param productDTO
      * @return
      */
-    @PostMapping("/add-new-product")
+    @PostMapping("/insert/")
     public ProductDTO addNewProduct(@RequestBody final ProductDTO productDTO) {
-        return productService.addNewProduct(productDTO);
+        return productService.insert(productDTO);
     }
 }

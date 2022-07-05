@@ -23,4 +23,5 @@ public class ProductConstants {
     public static final String UPDATED_PRODUCT_NAME_DUMMY = "updated-name";
     public static final String RECORD_NOT_FOUND_ERROR_MESSAGE = "Product was not found for parameter {id} = ";
     public static final String NEW_CATEGORY_NAME = "Non-existent category name";
+    public static final String NEW_SUPPLIER_NAME = "non-existent supplier name";
 }

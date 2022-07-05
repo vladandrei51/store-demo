@@ -5,6 +5,7 @@ import com.store.management.api.controller.ProductController;
 import com.store.management.api.errorhandling.RecordNotFoundException;
 import com.store.management.dao.CategoryDao;
 import com.store.management.dao.ProductDao;
+import com.store.management.dao.SupplierDao;
 import com.store.management.model.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class ProductControllerTests {
 
     @Autowired
     CategoryDao categoryDao;
+
+    @Autowired
+    SupplierDao supplierDao;
 
     @Test
     @Transactional
@@ -99,7 +103,7 @@ public class ProductControllerTests {
 
     @Transactional
     @Test
-    public void updateProduct_whenPostProduct_withValidId_forNewFields() {
+    public void updateProduct_whenPostProduct_withValidId_forNewCategory() {
         productDao.findById(VALID_PRODUCT_ID_111)
                 .ifPresentOrElse(
                         product -> {
@@ -107,6 +111,7 @@ public class ProductControllerTests {
                             var dto = domainToDTOMapper.mapProductToDTO(product);
                             var categories = dto.getCategories();
                             categories.add(NEW_CATEGORY_NAME);
+                            dto.setCategories(categories);
                             // calling the update method and check if the new category is set and also saved in db
                             var response = productController.updateProduct(dto, VALID_PRODUCT_ID_111);
                             assertTrue(response.getCategories().contains(NEW_CATEGORY_NAME));
@@ -117,6 +122,27 @@ public class ProductControllerTests {
                         }
                 );
     }
+
+    @Transactional
+    @Test
+    public void updateProduct_whenPostProduct_withValidId_forNewSupplier() {
+        productDao.findById(VALID_PRODUCT_ID_111)
+                .ifPresentOrElse(
+                        product -> {
+                            // adding to product a supplier name that doesn't exist in db
+                            var dto = domainToDTOMapper.mapProductToDTO(product);
+                            dto.setProductSupplierName(NEW_SUPPLIER_NAME);
+                            // calling the update method and check if the new supplier is set and also saved in db
+                            var response = productController.updateProduct(dto, VALID_PRODUCT_ID_111);
+                            assertEquals(response.getProductSupplierName(), NEW_SUPPLIER_NAME);
+                            assertTrue(supplierDao.findByName(NEW_SUPPLIER_NAME).isPresent());
+                        },
+                        () -> {
+                            throw new RecordNotFoundException(Product.class, "id", String.valueOf(VALID_PRODUCT_ID_111));
+                        }
+                );
+    }
+
 
     @Test
     public void updateProduct_whenPostProduct_withInvalidId() {

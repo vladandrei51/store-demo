@@ -11,7 +11,6 @@ public class Supplier extends PersistedBean {
     private String name;
     private Address address;
     private String url;
-    private String email;
 
     public Supplier(String name) {
         this.name = name;
@@ -45,12 +44,4 @@ public class Supplier extends PersistedBean {
         this.url = url;
     }
 
-    @Column(name = "Email")
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

@@ -11,6 +11,8 @@ import com.store.management.model.Category;
 import com.store.management.model.Product;
 import com.store.management.model.ProductSpec;
 import com.store.management.model.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    private static final Logger LOG = LoggerFactory.getLogger(ProductService.class);
 
     private final ProductDao productDao;
     private final DomainToDTOMapper domainToDTOMapper;
@@ -48,7 +51,10 @@ public class ProductService {
     public ProductDTO getById(int id) {
         return productDao.findById(id)
                 .map(domainToDTOMapper::mapProductToDTO)
-                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(id)));
+                .orElseThrow(() -> {
+                    LOG.warn("Get by id {} failure! Id not found in the db", id);
+                    throw new RecordNotFoundException(Product.class, "id", String.valueOf(id));
+                });
     }
 
     public ProductDTO updateProduct(ProductDTO updatedProduct, int idToModify) {
@@ -57,7 +63,10 @@ public class ProductService {
                     createProductOffDTO(updatedProduct, toBeUpdatedProduct);
                     return domainToDTOMapper.mapProductToDTO(toBeUpdatedProduct);
                 })
-                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(idToModify)));
+                .orElseThrow(() -> {
+                    LOG.error("Product with id {} doesn't exist so it can't be updated", idToModify);
+                    throw new RecordNotFoundException(Product.class, "id", String.valueOf(idToModify));
+                });
     }
 
     private void createProductOffDTO(ProductDTO updatedProduct, Product toBeUpdatedProduct) {
@@ -89,7 +98,10 @@ public class ProductService {
                 categoryDao.findByCategoryName(categoryName)
                         .ifPresentOrElse(
                                 categoriesToAssign::add,
-                                () -> categoriesToAssign.add(categoryDao.save(new Category(categoryName)))
+                                () -> {
+                                    LOG.info("New category: {} will be added to the db and assigned to the product", categoryName);
+                                    categoriesToAssign.add(categoryDao.save(new Category(categoryName)));
+                                }
                         ));
         toBeUpdatedProduct.setCategories(categoriesToAssign);
     }
@@ -98,7 +110,10 @@ public class ProductService {
         supplierDao.findByName(productSupplierName)
                 .ifPresentOrElse(
                         toBeUpdatedProduct::setSupplier,
-                        () -> toBeUpdatedProduct.setSupplier(supplierDao.save(new Supplier(productSupplierName)))
+                        () -> {
+                            LOG.info("New supplier: {} will be added to the db and assigned to the product", productSupplierName);
+                            toBeUpdatedProduct.setSupplier(supplierDao.save(new Supplier(productSupplierName)));
+                        }
                 );
     }
 
@@ -107,7 +122,10 @@ public class ProductService {
         productSpecDao.findByColorAndCapacity(color, capacity)
                 .ifPresentOrElse(
                         toBeUpdatedProduct::setProductSpec,
-                        () -> toBeUpdatedProduct.setProductSpec(productSpecDao.save(new ProductSpec(color, capacity)))
+                        () -> {
+                            LOG.info("New Product spec color: {}, capacity: {} will be added to the db and assigned to the product", color, capacity);
+                            toBeUpdatedProduct.setProductSpec(productSpecDao.save(new ProductSpec(color, capacity)));
+                        }
                 );
     }
 
@@ -117,10 +135,13 @@ public class ProductService {
                     productDao.delete(prod);
                     return domainToDTOMapper.mapProductToDTO(prod);
                 })
-                .orElseThrow(() -> new RecordNotFoundException(Product.class, "id", String.valueOf(id)));
+                .orElseThrow(() -> {
+                    LOG.warn("Delete failure! Cannot find product with id {}", id);
+                    throw new RecordNotFoundException(Product.class, "id", String.valueOf(id));
+                });
     }
 
-    public ProductDTO addNewProduct(ProductDTO productDTO) {
+    public ProductDTO insert(ProductDTO productDTO) {
         Product toAdd = new Product();
         createProductOffDTO(productDTO, toAdd);
         productDao.save(toAdd);

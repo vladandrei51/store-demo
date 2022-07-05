@@ -58,9 +58,9 @@ class ProductControllerMockTests {
 		var product = createDummyProduct();
 
 		given(domainToDTOMapper.mapProductToDTO(product)).willReturn(dto);
-		given(productService.addNewProduct(dto)).willReturn(dto);
+		given(productService.insert(dto)).willReturn(dto);
 
-		mockMvc.perform(post("/product/add-new-product")
+		mockMvc.perform(post("/api/product/insert/")
 						.content(mapper.writeValueAsString(domainToDTOMapper.mapProductToDTO(product)))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.productName", is(dto.getProductName())))
@@ -84,7 +84,7 @@ class ProductControllerMockTests {
 		given(domainToDTOMapper.mapProductToDTO(product)).willReturn(updatedDto);
 		given(productService.updateProduct(updatedDto, product.getId())).willReturn(updatedDto);
 
-		mockMvc.perform(post("/product/update-product/?id=" + product.getId())
+		mockMvc.perform(put("/api/product/update-product/?id=" + product.getId())
 						.content(mapper.writeValueAsString(domainToDTOMapper.mapProductToDTO(product)))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.productName", is(UPDATED_PRODUCT_NAME_DUMMY)))
@@ -108,7 +108,7 @@ class ProductControllerMockTests {
 		Mockito.doThrow(new RecordNotFoundException(Product.class, "id", String.valueOf(product.getId())))
 				.when(productService).updateProduct(updatedDto, product.getId());
 
-		mockMvc.perform(post("/product/update-product/?id=" + product.getId())
+		mockMvc.perform(put("/api/product/update-product?id=" + product.getId())
 						.content(mapper.writeValueAsString(domainToDTOMapper.mapProductToDTO(product)))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
@@ -124,7 +124,7 @@ class ProductControllerMockTests {
 		given(productService.getById(product.getId()))
 				.willReturn(dto);
 
-		mockMvc.perform(get("/product/get-by-id/?id=" + product.getId())
+		mockMvc.perform(get("/api/product/get/id/?id=" + product.getId())
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.productName", is(dto.getProductName())))
 				.andExpect(jsonPath("$.capacity", is(dto.getCapacity())))
@@ -142,7 +142,7 @@ class ProductControllerMockTests {
 		Mockito.doThrow(new RecordNotFoundException(Product.class, "id", String.valueOf(product.getId())))
 				.when(productService).getById(product.getId());
 
-		mockMvc.perform(get("/product/get-by-id/?id=" + product.getId())
+		mockMvc.perform(get("/api/product/get/id/?id=" + product.getId())
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
@@ -155,7 +155,7 @@ class ProductControllerMockTests {
 		given(productService.getAll())
 				.willReturn(allProductsResponse);
 
-		mockMvc.perform(get("/product/get-all")
+		mockMvc.perform(get("/api/product/get/")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)))
@@ -177,7 +177,7 @@ class ProductControllerMockTests {
 		given(productService.deleteProduct(product.getId()))
 				.willReturn(dto);
 
-		mockMvc.perform(delete("/product/delete-by-id/?id=" + product.getId())
+		mockMvc.perform(delete("/api/product/delete/id/?id=" + product.getId())
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.productName", is(dto.getProductName())))
 				.andExpect(jsonPath("$.capacity", is(dto.getCapacity())))
@@ -195,7 +195,7 @@ class ProductControllerMockTests {
 		Mockito.doThrow(new RecordNotFoundException(Product.class, "id", String.valueOf(product.getId())))
 				.when(productService).deleteProduct(product.getId());
 
-		mockMvc.perform(delete("/product/delete-by-id/?id=" + product.getId())
+		mockMvc.perform(delete("/api/product/delete/id?id=" + product.getId())
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}

@@ -1,11 +1,17 @@
-INSERT INTO address (id, address_description, city, country, phone_number, postal_code) VALUES (111, 'Benjamin Street nr 14, second apartment', 'New York City', 'US', '+002412312', 'A42AFGA');
-INSERT INTO address (id, address_description, city, country, phone_number, postal_code) VALUES (222, 'Calea Manastur 2-6', 'Cluj-Napoca', 'Romania', '+40722250000', '400372');
-INSERT INTO address (id, address_description, city, country, phone_number, postal_code) VALUES (333, 'Oak Wood Street 3-6 buildings', 'San Jose', 'US', '+12931721', '120938129');
+INSERT INTO address (id, address_description, city, country, phone_number, postal_code, email)
+VALUES (111, 'Benjamin Street nr 14, second apartment', 'New York City', 'US', '+002412312', 'A42AFGA',
+        'benjamin@google.com');
+INSERT INTO address (id, address_description, city, country, phone_number, postal_code, email)
+VALUES (222, 'Calea Manastur 2-6', 'Cluj-Napoca', 'Romania', '+40722250000', '400372', 'relatii-clienti@emag.ro');
+INSERT INTO address (id, address_description, city, country, phone_number, postal_code, email)
+VALUES (333, 'Oak Wood Street 3-6 buildings', 'San Jose', 'US', '+12931721', '120938129', 'ceo@samsung.com');
 
-INSERT INTO supplier (id, email, name, url, address_id) VALUES (111, 'ceo@siemens.com', 'Siemens', 'www.siemens.com', 111);
-INSERT INTO supplier (id, email, name, url, address_id) VALUES (222, 'relatii-clienti@emag.ro', 'Emag', 'www.emag.ro', 222);
-INSERT INTO supplier (id, email, name, url, address_id)
-VALUES (333, 'bruce@samsung.com', 'Samsung', 'www.samsung.com', 333);
+INSERT INTO supplier (id, name, url, address_id)
+VALUES (111, 'Siemens', 'www.siemens.com', 111);
+INSERT INTO supplier (id, name, url, address_id)
+VALUES (222, 'Emag', 'www.emag.ro', 222);
+INSERT INTO supplier (id, name, url, address_id)
+VALUES (333, 'Samsung', 'www.samsung.com', 333);
 
 INSERT INTO product_spec (id, color, capacity)
 VALUES (111, 'Candy Red', '256GB');

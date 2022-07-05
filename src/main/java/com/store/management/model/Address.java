@@ -13,6 +13,7 @@ public class Address extends PersistedBean {
     private String address; // combination of street name, number, other relevant info
     private String city;
     private String phoneNumber;
+    private String email;
 
     @Column(name = "Country")
     public String getCountry() {
@@ -57,5 +58,14 @@ public class Address extends PersistedBean {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    @Column(name = "Email")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
